@@ -13,14 +13,16 @@ import android.os.Messenger;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.javelindevices.javelin_sdk.model.BleMessage;
-import com.javelindevices.javelin_sdk.model.BleServiceListener;
-import com.javelindevices.javelin_sdk.model.ISensor;
-import com.javelindevices.javelin_sdk.model.ISensorManager;
-import com.javelindevices.javelin_sdk.util.JavelinControl;
+
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import model.BleMessage;
+import model.BleServiceListener;
+import model.ISensor;
+import model.ISensorManager;
+import util.JavelinControl;
 
 /**
  * Created by Aaron on 4/3/2015.
