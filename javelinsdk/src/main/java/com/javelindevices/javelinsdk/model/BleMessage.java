@@ -1,4 +1,4 @@
-package model;
+package com.javelindevices.javelinsdk.model;
 
 /**
  * Messages used to communicate between a client application and the remote JavelinService

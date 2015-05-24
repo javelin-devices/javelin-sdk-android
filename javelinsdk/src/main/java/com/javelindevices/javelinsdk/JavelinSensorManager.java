@@ -1,3 +1,5 @@
+package com.javelindevices.javelinsdk;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -18,11 +20,11 @@ import android.util.SparseArray;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import model.BleMessage;
-import model.BleServiceListener;
-import model.ISensor;
-import model.ISensorManager;
-import util.JavelinControl;
+import com.javelindevices.javelinsdk.model.BleMessage;
+import com.javelindevices.javelinsdk.model.BleServiceListener;
+import com.javelindevices.javelinsdk.model.ISensor;
+import com.javelindevices.javelinsdk.model.ISensorManager;
+import com.javelindevices.javelinsdk.util.JavelinControl;
 
 /**
  * Created by Aaron on 4/3/2015.

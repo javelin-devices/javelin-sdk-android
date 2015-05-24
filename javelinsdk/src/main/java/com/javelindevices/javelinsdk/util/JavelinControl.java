@@ -1,4 +1,4 @@
-package util;
+package com.javelindevices.javelinsdk.util;
 
 
 public class JavelinControl { //TODO: Could be renamed to Javelin constants

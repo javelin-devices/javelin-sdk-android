@@ -1,4 +1,4 @@
-package util;
+package com.javelindevices.javelinsdk.util;
 
 import android.bluetooth.BluetoothGatt;
 

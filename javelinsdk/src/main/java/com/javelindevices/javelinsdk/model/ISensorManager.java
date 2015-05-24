@@ -1,7 +1,7 @@
-package model;
+package com.javelindevices.javelinsdk.model;
 
 
-import util.SensorManagerException;
+import com.javelindevices.javelinsdk.util.SensorManagerException;
 
 /**
  * Created by Aaron on 12/18/2014.

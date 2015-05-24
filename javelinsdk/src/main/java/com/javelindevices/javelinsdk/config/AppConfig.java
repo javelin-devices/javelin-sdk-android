@@ -1,4 +1,4 @@
-package config;
+package com.javelindevices.javelinsdk.config;
 
 /**
  * Created by Aaron on 12/17/2014.

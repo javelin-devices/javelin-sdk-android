@@ -1,4 +1,4 @@
-package model;
+package com.javelindevices.javelinsdk.model;
 
 /**
  * Created by Aaron on 12/17/2014.

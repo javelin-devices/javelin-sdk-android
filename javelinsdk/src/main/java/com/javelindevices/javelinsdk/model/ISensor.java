@@ -1,4 +1,4 @@
-package model;
+package com.javelindevices.javelinsdk.model;
 
 import android.hardware.Sensor;
 
