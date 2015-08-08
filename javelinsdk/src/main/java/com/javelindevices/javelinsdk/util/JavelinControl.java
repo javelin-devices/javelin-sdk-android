@@ -32,35 +32,37 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
 
     public enum ControlIMU {
         IMU_CONTROL,
-        IMU_SAMPLE_RATE_L,
-        IMU_SAMPLE_RATE_H,
+        IMU_ACCELEROMETER_CONTROL,
+        IMU_GYRO_RAW_STREAM,
+        IMU_MAG_RAW_STREAM,
+        IMU_QUAT_STREAM,
+        IMU_SAMPLE_RATE, // for gyro and accelerom
         IMU_COMPASS_SAMPLE_RATE,
         IMU_ACC_FSR,
         IMU_GYRO_FSR,
         IMU_MOTION_THRESHOLD_AWAKE,
         IMU_LOW_POWER_SAMPLE_RATE;
+
         public int getIndex() {
             return this.ordinal();
         }
     }
 
-    public enum ControlDMP {
-        DMP_CTRL,
-        DMP_INTERRUPT_MODE,
-        DMP_FIFO_RATE_L,
-        DMP_FIFO_RATE_H,
-        DMP_FEATURE_TAP,
-        DMP_FEATURE_ORIENT,
-        DMP_FEATURE_QUAT,
-        DMP_FEATURE_GYRO,
-        DMP_FEATURE_ACC,
-        MPL_CALIB_GYRO,
-        MPL_TEMPCAL_GYRO,
-        MPL_CAL_COMPASS,
-        MPL_COMPASS_DIST,
-        MPL_QUAT;
+    public enum ControlMP {
+        ;
+
         public int getIndex() {
             return this.ordinal();
+        }
+    }
+
+    public enum IMUControlDef {
+        IMU_WOM,
+        IMU_LP_ACC,
+        IMU_RAW_NORMAL;
+
+        public int getIndex() {
+            return this.ordinal() + DEFAULT_CMD;
         }
     }
 
@@ -68,6 +70,7 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
         GENERAL,
         IMU,
         IMU_MP;
+
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
         }
@@ -75,17 +78,28 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
 
 
     public enum ControlResult {
-        SUCCESS,
-        INVALID_SETTING_LED,
-        INVALID_SETTING_VIB,
-        INVALID_SETTING_AUDIO_ENERGY,
-        INVALID_SETTING_AUDIO_SAMPLE,
-        INVALID_SETTING_IMU,
-        INVALID_SETTING_ACC,
-        INVALID_SETTING_GYRO,
-        INVALID_SETTING_MAG,
-        INVALID_SETTING_TEMP,
-        INVALID_SETTING_BATTERY;
+        CONTROL_SUCCESS,
+        CONTROL_INVALID_PACKET_TYPE,
+        CONTROL_INVALID_SETTING_LED,
+        CONTROL_INVALID_SETTING_VIB,
+        CONTROL_INVALID_SETTING_AUDIO_ENERGY,
+        CONTROL_INVALID_SETTING_AUDIO_SAMPLE,
+        CONTROL_INVALID_SETTING_TEMP,
+        CONTROL_INVALID_SETTING_BATTERY,
+        CONTROL_INVALID_SETTING_SYSTEM_TIMER,
+        CONTROL_INVALID_SETTING_IMU,
+        CONTROL_INVALID_SETTING_ACC_STREAM,
+        CONTROL_INVALID_SETTING_GYRO_STREAM,
+        CONTROL_INVALID_SETTING_MAG_STREAM,
+        CONTROL_INVALID_SETTING_QUAT_STREAM,
+        CONTROL_INVALID_SETTING_IMU_SAMPLE_RATE,
+        CONTROL_INVALID_SETTING_MAG_SAMPLE_RATE,
+        CONTROL_INVALID_SETTING_ACC_FSR,
+        CONTROL_INVALID_SETTING_GYRO_FSR,
+        CONTROL_INVALID_SETTING_WAKE_THRESHOLD,
+        CONTROL_INVALID_SETTING_LP_ACC_SAMPLE_RATE,
+        CONTROL_INVALID_SETTING_DMP_FEATURE_TAP,
+        CONTROL_INVALID_SETTING_DMP_FEATURE_ORIENT;
 
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
@@ -153,9 +167,21 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
         }
     }
 
+
     public enum MagControl {
         OFF,
         ON;
+
+        public int getIndex() {
+            return this.ordinal() + DEFAULT_CMD;
+        }
+    }
+
+    public enum QuatControl {
+        OFF,
+        QUAT_3X,
+        QUAT_6X,
+        QUAT_9X;
 
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
@@ -190,29 +216,12 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
     }
 
 
-    public enum IMU_CONTROL_VALUE {
-        IMU_THRESH_DET,
-        IMU_ACC,
-        IMU_GYRO,
-        IMU_MAG,
-        IMU_ACC_GYRO,
-        IMU_ACC_COMP,
-        IMU_GYRO_MAG,
-        IMU_ACC_GYRO_MAG,
-        IMU_LP_ACCEL,
-        IMU_TEST;
-        public int getIndex() {
-            return this.ordinal() + DEFAULT_CMD;
-        }
-    }
-
-
-
     public enum ACC_FSR_VALUE {
         ACC_FSR_2,
         ACC_FSR_4,
         ACC_FSR_8,
         ACC_FSR_16;
+
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
         }
@@ -229,8 +238,6 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
             return this.ordinal() + DEFAULT_CMD;
         }
     }
-
-
 
 
     public enum LOW_POWER_ACCEL_RATE_VALUE {
@@ -251,16 +258,14 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
     }
 
 
-
-
     public enum DMP_CONTROL_VALUE {
         OFF,
         ON;
+
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
         }
     }
-
 
 
     public enum DMP_INTERRUPT_MODE_VALUE {
@@ -273,7 +278,6 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
     }
 
 
-
     public enum DMP_FEATURE_TAP_VALUE {
         OFF,
         ON;
@@ -282,7 +286,6 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
             return this.ordinal() + DEFAULT_CMD;
         }
     }
-
 
 
     public enum DMP_FEATURE_ORIENT_VALUE {
@@ -299,6 +302,7 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
         OFF,
         QUAT_3X,
         QUAT_6X;
+
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
         }
@@ -324,8 +328,4 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
             return this.ordinal() + DEFAULT_CMD;
         }
     }
-
-
-
-
 }

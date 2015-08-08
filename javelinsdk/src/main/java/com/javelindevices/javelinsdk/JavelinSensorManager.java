@@ -15,37 +15,55 @@ import android.os.Messenger;
 import android.util.Log;
 import android.util.SparseArray;
 
-
-
-import java.lang.ref.WeakReference;
-import java.util.List;
-
 import com.javelindevices.javelinsdk.model.BleMessage;
 import com.javelindevices.javelinsdk.model.BleServiceListener;
 import com.javelindevices.javelinsdk.model.ISensor;
 import com.javelindevices.javelinsdk.model.ISensorManager;
 import com.javelindevices.javelinsdk.util.JavelinControl;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+
 /**
  * Created by Aaron on 4/3/2015.
  */
-public class JavelinSensorManager extends ISensorManager implements BleServiceListener { //extends Activity {
+public class JavelinSensorManager extends ISensorManager implements BleServiceListener {
 
     private Messenger mService = null;
     private Context context;
-    private ISensorManager.SensorEventListener listener;
+    private JavelinEventListener listener;
     private static final String JAVELIN_SERVICE = "com.javelindevices.j1_sdk.JavelinService";
 
+    // For streamable (notification-based) sensors only.
+    private static HashMap<Integer, ArrayList<JavelinEventListener>> sensorListenersMap = new HashMap<Integer, ArrayList<JavelinEventListener>>();
+    static {
+        sensorListenersMap.put(ISensor.TYPE_ACCELEROMETER, new ArrayList<JavelinEventListener>());
+        sensorListenersMap.put(ISensor.TYPE_MAGNETIC_FIELD, new ArrayList<JavelinEventListener>());
+        sensorListenersMap.put(ISensor.TYPE_GYROSCOPE, new ArrayList<JavelinEventListener>());
+        sensorListenersMap.put(ISensor.TYPE_TEMPERATURE, new ArrayList<JavelinEventListener>());
+        sensorListenersMap.put(ISensor.TYPE_BATTERY, new ArrayList<JavelinEventListener>());
+        sensorListenersMap.put(ISensor.TYPE_AUDIO_STREAM, new ArrayList<JavelinEventListener>());
+        sensorListenersMap.put(ISensor.TYPE_AUDIO_ENERGY, new ArrayList<JavelinEventListener>());
+        sensorListenersMap.put(ISensor.TYPE_QUATERNION, new ArrayList<JavelinEventListener>());
+    }
+
+    /**
+     * Create a JavelinSensorManager object
+     * @param context an android Activity
+     * @param deviceAddress the address of the javelin device to connect to.
+     */
     public JavelinSensorManager(Context context, String deviceAddress) {
         this.context = context;
         mMessenger = new Messenger(new IncomingHandler(this));
         this.deviceAddress = deviceAddress;
+
     }
 
-
-    /************* Client Functions  ****************************/
     @Override
-    public void setListener(ISensorManager.SensorEventListener listener) {
+    public void setListener(JavelinEventListener listener) {
         this.listener = listener;
     }
 
@@ -54,22 +72,20 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "Bound to javelin android service.");
             mService = new Messenger(service);
-            Log.d(TAG, "Sending connect message");
             Bundle bundle = new Bundle();
             bundle.putString("deviceAddress", deviceAddress);
             sendMessage(BleMessage.MSG_CONNECT, 0, 0, bundle);
-
-            //mBoundService = ((LocalService.LocalBinder)service).getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "SERVICE DISCONNECTED!");
             mService = null;
         }
     };
 
     public void sendMessage(int message) {
-       sendMessage(message, -1, -1, null);
+        sendMessage(message, -1, -1, null);
     }
 
     public void sendMessage(int message, int arg1, int arg2, Object obj) {
@@ -80,7 +96,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
                 msg.arg1 = arg1;
                 msg.arg2 = arg2;
                 msg.obj = obj;
-                mService.send(msg);
+                mService.send(msg); //TODO sometimes causes null pointer exception, mService is null
             } else {
                 mService = null;
             }
@@ -89,7 +105,6 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
             mService = null;
         }
     }
-
 
     /***
      * Android L (lollipop, API 21) introduced a new problem when trying to invoke implicit intent,
@@ -124,8 +139,6 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         explicitIntent.setComponent(component);
         return explicitIntent;
     }
-
-
 
     Messenger mMessenger;
 
@@ -175,30 +188,11 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     }
 
 
-
-
-
-
-
-
     /**************** Sensor related functions ********************/
 
-
-    public void onSensorChanged(int sensor, float[] data) {
-        if(data != null) {
-            listener.onSensorChanged(sensor, data);
-        }
-    }
-
     private static final String TAG = JavelinSensorManager.class.getSimpleName();
-    // Component Settings
-    public static final int LED_TOGGLE_SINGLE = JavelinControl.LedControl.LED_PULSE.getIndex();
-    public static final int LED_TOGGLE_REPEAT_START = JavelinControl.LedControl.LED_SAW_TOOTH.getIndex();
-    public static final int VIB_TOGGLE_SINGLE = JavelinControl.VibrationControl.VIB_PULSE.getIndex();
-    public static final int VIB_TOGGLE_REPEAT_START = JavelinControl.VibrationControl.VIB_SAW_TOOTH.getIndex();
-    public static final int AUDIO_QUALITY_MEDIUM = JavelinControl.AudioStreamControl.AUDIO_STREAM_MED_QUALITY.getIndex();
-    public static final int AUDIO_QUALITY_HIGH = JavelinControl.AudioStreamControl.AUDIO_STREAM_HIGH_QUALITY.getIndex();
 
+    // Component Settings
     private final String deviceAddress;
     private final SparseArray<Boolean> sensors = new SparseArray<Boolean>();
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
@@ -218,25 +212,38 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     }
 
     @Override
-    public void registerSensor(int sensorType) {
-        sensors.put(sensorType, true);
+    public void registerListener(JavelinEventListener listener, int sensorType) {
+        sensorListenersMap.get(sensorType).add(listener);
         enableJavelinSensor(sensorType, true);
     }
 
 
     @Override
-    public void unregisterSensor(int sensorType) {
+    public void unregisterListener(JavelinEventListener listener, int sensorType) {
+        if(sensorListenersMap.get(sensorType).size() > 0) {
+            sensorListenersMap.get(sensorType).remove(listener);
+        } else {
+            Log.e(TAG, "Disabled a sensor for a listener that wasn't registered to it already.");
+        }
         enableJavelinSensor(sensorType, false);
-        sensors.remove(sensorType);
     }
 
     @Override
     public void unregisterAll() {
-        for(int i = 0; i < sensors.size(); i++) {
-            enableJavelinSensor(sensors.keyAt(i), false);
+        // This will remove all listeners from the application and disable all sensors for it.
+        for (ArrayList<JavelinEventListener> listeners : sensorListenersMap.values()) {
+            listeners.clear();
         }
-
         sendMessage(BleMessage.MSG_SENSOR_UNREGISTER_ALL);
+    }
+
+    public void onSensorChanged(int sensor, float[] data) {
+        if(data != null) {
+            ArrayList<JavelinEventListener> listeners = sensorListenersMap.get(sensor);
+            for(JavelinEventListener l : listeners) {
+                l.onSensorChanged(sensor, data);
+            }
+        }
     }
 
     // Once we are connected, we'll let the listener know our bond status.
@@ -245,6 +252,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         Log.d(TAG, "connected");
         listener.onSensorManagerConnected();
         updateBondStateUI();
+
     }
 
     @Override
@@ -260,6 +268,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     @Override
     public void onReadRemoteRssi(int rssi) {
+        setAcceleromGyroRate(70);
         listener.onReadRemoteRssi(rssi);
     }
 
@@ -268,11 +277,6 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
             @Override
             public void run() {
                 if (listener != null) {
-                  //  if (bleManager.getBondState() == BluetoothDevice.BOND_BONDED) {
-                        //     listener.onBondCreated();
-                  //  } else { //TODO: add onBondConnecting?
-                        //    listener.onBondRemoved();
-                 //   }
                 }
             }
         });
@@ -280,10 +284,6 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     @Override
     public void onServiceDiscovered() {
-        Log.d(TAG, "Services Discovered");
-        // enable all sensors that were registered previously
-        // TODO: remove, as service takes care of registering app's sensors at the moment...
-        // TODO: service will forget these susbcriptions if the app calls......
     }
 
     @Override
@@ -300,7 +300,6 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         sendMessage(what, sensorType,0,null);
     }
 
-    // TODO: Change return type
     public boolean createBond() {
         sendMessage(BleMessage.MSG_BOND_CREATE);
         return true;
@@ -311,7 +310,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         return true;
     }
 
-    
+
     public void ledEnable(boolean enable) {
         int command = -1;
         if (enable) {
@@ -319,24 +318,29 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         } else {
             command = JavelinControl.LedControl.LED_OFF.getIndex();
         }
-        Log.d(TAG, "enabling/disabling LED");
         sendMessage(BleMessage.MSG_SET_CONTROL, ISensor.TYPE_LED, command, null);
     }
 
-    /**
-     * @param setting LED_PULSE or LED_SAW_TOOTH
-     */
-    public void ledStartBlinking(int setting) {
-        sendMessage(BleMessage.MSG_SET_CONTROL, ISensor.TYPE_LED, setting, null);
+    @Override
+    public void setLedIntensity(int intensity) {
+        sendMessage(BleMessage.MSG_SET_INTENSITY, ISensor.TYPE_LED, intensity, null);
     }
 
-    public void ledStopRepeat() {
-        sendMessage(BleMessage.MSG_SET_CONTROL, ISensor.TYPE_LED,
-                JavelinControl.LedControl.LED_TRIANGLE.getIndex(), null );
+    @Override
+    public void setLedBlinkType(int blinkType) {
+        sendMessage(BleMessage.MSG_SET_TYPE, ISensor.TYPE_LED, blinkType, null);
     }
 
-    // TODO: remove the "enabling" of vibration, etc. Simply turn it on when you want to vibrate it and
-    // Turn it off otherwise.
+    @Override
+    public void setLedBlinkRate(int rate) {
+        sendMessage(BleMessage.MSG_SET_RATE, ISensor.TYPE_LED, rate, null);
+    }
+
+    @Override
+    public void ledBlink(int times) {
+        sendMessage(BleMessage.MSG_SET_RATE, ISensor.TYPE_LED, times, null);
+    }
+
     public void vibrationEnable(boolean enable) {
         int command = -1;
         if (enable) {
@@ -347,32 +351,32 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         sendMessage(BleMessage.MSG_SET_CONTROL, ISensor.TYPE_VIBRATOR, command, null);
     }
 
-    /**
-     * @param setting VIB_PULSE or VIB_SAW_TOOTH
-     */
-    public void vibrationStartRepeat(int setting) { // TODO: startRepeat(setting, intensity)
-        sendMessage(BleMessage.MSG_SET_CONTROL, ISensor.TYPE_VIBRATOR, setting, null);
-        sendMessage(BleMessage.MSG_SET_INTENSITY, ISensor.TYPE_VIBRATOR, 40, null);
+    @Override
+    public void setVibrationIntensity(int intensity) {
+        sendMessage(BleMessage.MSG_SET_INTENSITY, ISensor.TYPE_VIBRATOR, intensity, null);
     }
 
+    @Override
+    public void setVibrationType(int type) {
+        sendMessage(BleMessage.MSG_SET_TYPE, ISensor.TYPE_VIBRATOR, type, null);
+    }
 
-    public void vibrationStopRepeat() {
-        sendMessage(BleMessage.MSG_SET_CONTROL, ISensor.TYPE_VIBRATOR,
-                JavelinControl.VibrationControl.VIB_OFF.getIndex(), null);
+    @Override
+    public void setVibrationRate(int rate) {
+        sendMessage(BleMessage.MSG_SET_RATE, ISensor.TYPE_VIBRATOR, rate, null);
+    }
+
+    @Override
+    public void vibrate(int times) {
+        sendMessage(BleMessage.MSG_SET_RATE, ISensor.TYPE_VIBRATOR, times, null);
     }
 
     public void setAudioQuality(int quality) {
-    //    AudioStream.setAudioQuality(quality);
+        //    AudioStream.setAudioQuality(quality);
     }
 
     @Override
-    public short[] getAudio() {
-        return new short[0];
+    public void setAcceleromGyroRate(int rate) {
+        sendMessage(BleMessage.MSG_SET_SAMPLING_RATE, ISensor.TYPE_ACCELEROMETER, rate, null);
     }
-
-    // TODO: remove from sdk
-    @Override
-    public void startDFU() {
-    }
-
 }

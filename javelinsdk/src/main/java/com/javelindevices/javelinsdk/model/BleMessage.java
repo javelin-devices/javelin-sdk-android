@@ -1,7 +1,8 @@
 package com.javelindevices.javelinsdk.model;
 
 /**
- * Messages used to communicate between a client application and the remote JavelinService
+ * Messages used to communicate between a client application and the remote javelin service on the
+ * official app.
  */
 public class BleMessage {
     public static final int MSG_CONNECT = 1;
@@ -15,13 +16,13 @@ public class BleMessage {
     public static final int MSG_SET_RATE = 8;
     public static final int MSG_SET_CONTROL = 9;
     public static final int MSG_SET_INTENSITY = 10;
-    public static final int MSG_SENSOR_UNREGISTER_ALL = 11;
-    public static final int MSG_SENSOR_RATE_CHANGED = 12;
-    public static final int MSG_BOND_CREATE = 13;
-    public static final int MSG_BOND_DESTROY = 14;
+    public static final int MSG_SET_TYPE = 11;
+    public static final int MSG_PULSE = 12;
+    public static final int MSG_SET_SAMPLING_RATE = 13;
 
+    public static final int MSG_SENSOR_UNREGISTER_ALL = 50;
+    public static final int MSG_SENSOR_RATE_CHANGED = 51;
+    public static final int MSG_BOND_CREATE = 52;
+    public static final int MSG_BOND_DESTROY = 53;
 
-    public static final long SCAN_PERIOD = 3000;
-    public static final String KEY_MAC_ADDRESSES = "KEY_MAC_ADDRESSES";
-    public static final String DEVICE_NAME = "J1";
 }
