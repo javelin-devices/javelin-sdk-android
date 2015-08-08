@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -24,12 +25,10 @@ import com.javelindevices.javelinsdk.util.JavelinControl;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 
-/**
- * Created by Aaron on 4/3/2015.
- */
 public class JavelinSensorManager extends ISensorManager implements BleServiceListener {
 
     private Messenger mService = null;
@@ -39,6 +38,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     // For streamable (notification-based) sensors only.
     private static HashMap<Integer, ArrayList<JavelinEventListener>> sensorListenersMap = new HashMap<Integer, ArrayList<JavelinEventListener>>();
+
     static {
         sensorListenersMap.put(ISensor.TYPE_ACCELEROMETER, new ArrayList<JavelinEventListener>());
         sensorListenersMap.put(ISensor.TYPE_MAGNETIC_FIELD, new ArrayList<JavelinEventListener>());
@@ -52,7 +52,8 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     /**
      * Create a JavelinSensorManager object
-     * @param context an android Activity
+     *
+     * @param context       an android Activity
      * @param deviceAddress the address of the javelin device to connect to.
      */
     public JavelinSensorManager(Context context, String deviceAddress) {
@@ -61,6 +62,9 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         this.deviceAddress = deviceAddress;
 
     }
+
+    // Holds all control messages prior to connecting to the javelin service and javelin peripheral.
+    LinkedList<Message> messageQueue = new LinkedList<Message>();
 
     @Override
     public void setListener(JavelinEventListener listener) {
@@ -89,31 +93,42 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     }
 
     public void sendMessage(int message, int arg1, int arg2, Object obj) {
-        try {
-            Message msg = Message.obtain(null, message);
-            if (msg != null) {
-                msg.replyTo = mMessenger;
-                msg.arg1 = arg1;
-                msg.arg2 = arg2;
-                msg.obj = obj;
-                mService.send(msg); //TODO sometimes causes null pointer exception, mService is null
+
+        Message msg = Message.obtain(null, message);
+        if (msg != null) {
+            msg.replyTo = mMessenger;
+            msg.arg1 = arg1;
+            msg.arg2 = arg2;
+            msg.obj = obj;
+
+            if (mService == null) {
+                messageQueue.add(msg);
             } else {
-                mService = null;
+                sendMessage(msg);
             }
-        } catch (Exception e) {
+        } else {
+            mService = null;
+        }
+    }
+
+    public void sendMessage(Message msg) {
+        try {
+            mService.send(msg);
+        } catch (RemoteException e) {
             Log.w(TAG, "Error communicating with the Javelin service", e);
             mService = null;
         }
     }
 
-    /***
+    /**
      * Android L (lollipop, API 21) introduced a new problem when trying to invoke implicit intent,
      * "java.lang.IllegalArgumentException: Service Intent must be explicit"
-     *
+     * <p/>
      * If you are using an implicit intent, and know only 1 target would answer this intent,
      * This method will help you turn the implicit intent into the explicit form.
-     *
+     * <p/>
      * Inspired from SO answer: http://stackoverflow.com/a/26318757/1446466
+     *
      * @param context
      * @param implicitIntent - The original implicit intent
      * @return Explicit Intent created from the implicit original intent
@@ -175,7 +190,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
                         Log.d(TAG, "Unregistered sensor: " + msg.arg1);
                         break;
                     case BleMessage.MSG_SENSOR_UPDATE:
-                        Bundle b = (Bundle)msg.obj;
+                        Bundle b = (Bundle) msg.obj;
                         client.onSensorChanged(msg.arg1, b.getFloatArray("data"));
                         break;
                     case BleMessage.MSG_SENSOR_RATE_CHANGED:
@@ -188,7 +203,9 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     }
 
 
-    /**************** Sensor related functions ********************/
+    /**
+     * ************* Sensor related functions *******************
+     */
 
     private static final String TAG = JavelinSensorManager.class.getSimpleName();
 
@@ -220,7 +237,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     @Override
     public void unregisterListener(JavelinEventListener listener, int sensorType) {
-        if(sensorListenersMap.get(sensorType).size() > 0) {
+        if (sensorListenersMap.get(sensorType).size() > 0) {
             sensorListenersMap.get(sensorType).remove(listener);
         } else {
             Log.e(TAG, "Disabled a sensor for a listener that wasn't registered to it already.");
@@ -238,9 +255,9 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     }
 
     public void onSensorChanged(int sensor, float[] data) {
-        if(data != null) {
+        if (data != null) {
             ArrayList<JavelinEventListener> listeners = sensorListenersMap.get(sensor);
-            for(JavelinEventListener l : listeners) {
+            for (JavelinEventListener l : listeners) {
                 l.onSensorChanged(sensor, data);
             }
         }
@@ -250,6 +267,14 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     @Override
     public void onConnected() {
         Log.d(TAG, "connected");
+
+        // Start sending the messages we had queued up:
+        Log.d(TAG, "Client message queue size: " + messageQueue.size());
+        for (Message msg : messageQueue) {
+            sendMessage(msg);
+        }
+        messageQueue.clear();
+
         listener.onSensorManagerConnected();
         updateBondStateUI();
 
@@ -292,12 +317,12 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     private void enableJavelinSensor(int sensorType, boolean enable) {
         int what = -1;
-        if(enable) {
+        if (enable) {
             what = BleMessage.MSG_REGISTER_SENSOR;
         } else {
             what = BleMessage.MSG_UNREGISTER_SENSOR;
         }
-        sendMessage(what, sensorType,0,null);
+        sendMessage(what, sensorType, 0, null);
     }
 
     public boolean createBond() {
