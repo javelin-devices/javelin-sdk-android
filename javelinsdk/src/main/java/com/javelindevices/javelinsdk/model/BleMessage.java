@@ -17,12 +17,17 @@ public class BleMessage {
     public static final int MSG_SET_CONTROL = 9;
     public static final int MSG_SET_INTENSITY = 10;
     public static final int MSG_SET_TYPE = 11;
-    public static final int MSG_PULSE = 12;
+    public static final int MSG_SET_PULSE = 12;
     public static final int MSG_SET_SAMPLING_RATE = 13;
+    public static final int MSG_SET_FULL_SCALE_RANGE = 14;
+    public static final int MSG_SET_FILTER = 15;
 
     public static final int MSG_SENSOR_UNREGISTER_ALL = 50;
     public static final int MSG_SENSOR_RATE_CHANGED = 51;
     public static final int MSG_BOND_CREATE = 52;
     public static final int MSG_BOND_DESTROY = 53;
 
+    // Miscellaneous sensor types that the end user doesn't need to use
+    public static final int TYPE_LED = 203;
+    public static final int TYPE_VIBRATOR = 204;
 }

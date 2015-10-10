@@ -1,7 +1,7 @@
 package com.javelindevices.javelinsdk.model;
 
 
-import com.javelindevices.javelinsdk.util.SensorManagerException;
+import com.javelindevices.javelinsdk.SensorManagerException;
 
 /**
  * Contains the Javelin's API
@@ -9,13 +9,14 @@ import com.javelindevices.javelinsdk.util.SensorManagerException;
 public abstract class ISensorManager {
 
     public interface JavelinEventListener {
+
         /**
-         * Indicates whether there was an update from a sensor
+         * Indicates there was a sensor event
+         * @param event  The {@link JavelinSensorEvent}
+         * @see @{link ISensor}
          *
-         * @param sensorType the sensor type described in {@link com.javelindevices.javelinsdk.model.ISensor}
-         * @param values array containing the data for that sensor
          */
-        public void onSensorChanged(int sensorType, float[] values);
+        public void onSensorChanged(JavelinSensorEvent event);
 
         /**
          * Called when a connection has been established to the javelin device / service
@@ -60,28 +61,32 @@ public abstract class ISensorManager {
     public abstract void disable();
 
     /**
-     * Reads the signal strength from the javelin device to the central device.
+     * Reads the signal strength from the javelin device to the central device. The result will
+     * be shown on the onReadRemoteRssi() callback in {@link com.javelindevices.javelinsdk.model.ISensorManager.JavelinEventListener}.
      */
     public abstract void readRssi();
 
     /**
      * Enable notifications from a sensor.
+     * A {@link com.javelindevices.javelinsdk.JavelinSensorManager JavelinSensorManager} will remember all registered listeners
+     *
      * @param sensorType The sensor to enable.
      */
     public abstract void registerListener(JavelinEventListener listener, int sensorType);
 
     /**
-     * Disables notifications and data from a sensor for the given listener
+     * Disables notifications and data from a sensor for the given listener, if it is already subscribed.
      * If other listeners are still registered to the sensor, they'll still receive data.
+     * When there are no listeners subscribed to a sensor, the javelin device will turn that sensor off
+     * to save battery.
      *
-     * A sensor should be unregistered when no more data
-     * is needed from it in order to save battery life on the javelin device.
+     * A sensor listener should be unregistered when no more data is needed from it for less battery consumption.
      * @param sensorType a type defined in {@link com.javelindevices.javelinsdk.model.ISensor}
      */
     public abstract void unregisterListener(JavelinEventListener listener, int sensorType);
 
     /**
-     * Removes all listeners, stopping sensor notifications.
+     * Removes all listeners, stopping sensor updates.
      *
      * This does not disconnect the application from the javelin service.
      */
@@ -95,44 +100,49 @@ public abstract class ISensorManager {
 
     /**
      * Removes the bond from the application to the javelin device.
-     * @return
+     * @return boolean indicating whether the removal was successful.
      */
     public abstract boolean removeBond();
 
     /**
      * LED on/off switch. Will cancel any blinking taking place, if any.
-     * @param enable
+     * @param enable boolean
      */
     public abstract void ledEnable(boolean enable);
 
     /**
      * Sets the LED intensity on a scale of 1 - 100, 100 being the strongest intensity.
-     * @param intensity the intensity of the LED from 1 to 100 inclusive.
+     * @param intensity  the intensity of the LED from 1 to 100 inclusive.
      */
     public abstract void setLedIntensity(int intensity);
 
     /**
-     * Sets the kind of blinking type to enable, such as LED_TYPE_SAWTOOTH, LED_TYPE_SOLID, LED_TYPE_TRIANGLE.
+     * Sets the kind of blinking type to enable when {@link #ledEnable(boolean) ledEnable(true)} is called
      * @param blinkType Integer constant describing the kind of blinking type to enable.
-     *             This can be any of the LED_TYPE contants from {@link com.javelindevices.javelinsdk.model.ISensor}
+     *             This can be any of the LED_TYPE contants from {@link com.javelindevices.javelinsdk.model.JavelinSettings}
      */
     public abstract void setLedBlinkType(int blinkType);
 
     /**
-     * Sets the LED's blinking rate for the PULSE, TRIANGLE, and SAWTOOTH led types.
-     * @param rate the pulsation rate of the LED.
+     * Sets the LED's blinking rate for the PULSE, TRIANGLE, and SAWTOOTH LED types.
+     * @param rate the blinking rate, in .1Hz values. A value of 10 will make the LED blink once per second.
      */
     public abstract void setLedBlinkRate(int rate);
 
     /**
-     * Switches the component on and off for the set number of times at the current rate, pulsation type,
-     * and intensity.
-     * @param times how many times to blink the LED.
+     * Sets how many times the LED goes on and off for the specified number of times at the current
+     * rate, pulsation type, and intensity.
+     *
+     * Sending in the maximum value (255) will make it blink indefinitely until the LED is disabled
+     * or a disconnection event happens.
+     *
+     * @param times how many times to blink the LED when calling the {@link #ledEnable(boolean) ledEnable}
+     *              method. Allowed values are [1,255].
      */
-    public abstract void ledBlink(int times);
+    public abstract void setLedBlinkNumber(int times);
 
     /**
-     * Vibrator on / off switch. Will override any vibrations taking place.
+     * Vibrator on / off switch. This will override any vibrations taking place.
      * @param enable
      */
     public abstract void vibrationEnable(boolean enable);
@@ -140,38 +150,59 @@ public abstract class ISensorManager {
     /**
      * Sets the intensity of the vibration from 1 to 100 inclusive, 100 being the strongest intensity.
      *
-     * @param intensity the intensity of vibration from 1 to 100 inclusive.
+     * @param intensity  the intensity of vibration from 1 to 100 inclusive.
      */
     public abstract void setVibrationIntensity(int intensity);
 
     /**
      * Sets the vibration type to use
-     * @param type one of the VIB_TYPE constants in {@link com.javelindevices.javelinsdk.model.ISensor}
+     * @param type  one of the VIB_TYPE constants in {@link com.javelindevices.javelinsdk.model.ISensor}
      */
     public abstract void setVibrationType(int type);
 
     /**
      * Sets the vibration rate for the PULSE, TRIANGLE, and SAWTOOTH vibration types.
-     * @param rate an integer indicating the number of vibrations per second.
+     * @param rate  an integer indicating the number of vibrations per 1/10th of a second (.1Hz).
+     *             A value of 10 will make it vibrate once per second.
      */
     public abstract void setVibrationRate(int rate);
 
     /**
-     * Vibrates a set number of times if the SOLID, PULSE, TRIANGLE or SAWTOOTH vibration type is set.
-     * If the SOLID vibration type is set, it will vibrate for that many seconds.
+     * Sets the number of times to vibrate if the SOLID, PULSE, TRIANGLE or SAWTOOTH vibration type is set.
+     * If the SOLID vibration type is set, it will vibrate for that many seconds, otherwise, it will
+     * use the default rate of vibration or one that has been set.
      *
-     * @param times the number of times to vibrate
+     * Sending in the maximum value (255) will make it blink indefinitely until the vibrator is disabled
+     * or a disconnection event happens.
+     *
+     * @param times  the number of times to vibrate
      */
-    public abstract void vibrate(int times);
+    public abstract void setVibrationRepeatNumber(int times);
+
 
 
     public abstract void setAudioQuality(int quality);
 
     /**
-     * Sets the sampling rate of the accelerometer and gyroscope
-     * @param rate the sampling rate from TODO: write range
+     * Sets the sampling rate of the accelerometer and gyroscope to the value closest to the given
+     * parameter. The default rate, 1000Hz, must be divisible by the desired sample rate -- otherwise it attempts
+     * to approximate it.
+     *
+     * @param rate the sampling rate to set the gyroscope and accelerometer to.
      */
     public abstract void setAcceleromGyroRate(int rate);
 
+
+    public abstract void setAccelerometerFullScaleRange(int range);
+
+    public abstract void setGyroscopeFullScaleRange(int range);
+
+    /**
+     * Set the divisor used to divide the default sample rate up.
+     * The default sample rate is 1000Hz
+     *
+     * @param divisor
+     */
+    public abstract void setAcceleromGyroSampleRateDivisor(int divisor);
 }
 

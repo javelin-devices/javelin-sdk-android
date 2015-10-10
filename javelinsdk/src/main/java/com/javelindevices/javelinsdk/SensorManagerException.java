@@ -1,4 +1,4 @@
-package com.javelindevices.javelinsdk.util;
+package com.javelindevices.javelinsdk;
 
 public class SensorManagerException extends IllegalStateException {
 }
