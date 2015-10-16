@@ -93,7 +93,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         @Override
         public void onServiceDisconnected(ComponentName name) {
             connected = false;
-            Log.d(TAG, "Service Disconnected!");
+            Log.d(TAG, "Javelin service disconnected!");
             mService = null;
         }
     };
@@ -114,10 +114,9 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
             // We can send connect messages but only if we already bound to the service
             // For all other messages, we put them in the queue if service is null or we aren't connected.
             if (msg.what != BleMessage.MSG_CONNECT && (mService == null || !connected)) {
-                Log.d(TAG, "Adding message" + msg.what + " to the queue since we're not yet connected");
+                // Log.d(TAG, "Adding message" + msg.what + " to the queue since we're not yet connected");
                 messageQueue.add(msg);
             } else {
-                Log.d(TAG, "Sending message!" + msg.what);
                 sendMessage(msg);
             }
         } else {
@@ -127,7 +126,6 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     private void sendMessage(Message msg) {
         try {
-            Log.d(TAG, "Sending msg " + msg.what);
             mService.send(msg);
         } catch (RemoteException e) {
             Log.w(TAG, "Error communicating with the Javelin service", e);
@@ -250,8 +248,8 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         try {
             context.unbindService(mConnection);
         } catch (Exception e) {
-            Log.w(TAG, "Something went wrong while unbinding the service.");
-            e.printStackTrace();
+        //    Log.w(TAG, "Something went wrong while unbinding the service.");
+        //    e.printStackTrace();
         }
         mService = null;
     }
@@ -295,7 +293,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     @Override
     public void onConnected() {
         connected = true;
-        Log.d(TAG, "connected");
+        Log.d(TAG, "Connected to a Javelin device");
 
         // Start sending the messages we had queued up:
         Log.d(TAG, "Client message queue size: " + messageQueue.size());
