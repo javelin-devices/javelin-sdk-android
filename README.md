@@ -10,7 +10,7 @@ repositories {
 In the application build.gradle declare the following dependency:
 ```
 dependencies {
-    compile 'com.github.javelin-dev:javelin-sdk-android:v0.21'
+    compile 'com.github.javelin-dev:javelin-sdk-android:v1.0.0'
 }
 ```
 Finally, **you must download and install** the [JavelinServiceApp](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinServiceApp.apk) application.
