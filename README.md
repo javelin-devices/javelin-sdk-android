@@ -45,7 +45,7 @@ In addition, you can also refer the [example](https://github.com/javelin-dev/jav
 
 If you have the javelin's `device address`, from a scanning activity or a previously address, you can instantiate the `JavelinSensorManager` with an Activity context and the `device address` and initiate a connection through it. Note that if you want to listen to Javelin events -- such as connection events -- the class will need to implement the `JavelinEventListener` interface.
 
-```
+```java
 public class MainActivity extends Activity implements ISensorManager.JavelinEventListener {
 JavelinSensorManager mSensorManager;
 	@Override
@@ -80,7 +80,7 @@ To disconnect from the Javelin, simply call `mSensorManager.disable()`. You can 
 
 ## Enabling a sensor and receiving data
 Via our `JavelinSensorManager` object, we can register listeners to various Javelin sensors and receive data from them.
-```
+```java
 
 public class SomeActivity extends Activity implements ISensorManager.JavelinEventListener {
 	...
