@@ -13,7 +13,7 @@ dependencies {
     compile 'com.github.javelin-dev:javelin-sdk-android:v1.0.0'
 }
 ```
-Finally, **you must download and install** the [JavelinServiceApp](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinServiceApp.apk) application.
+Finally, **you must download and install** the [JavelinServiceApp](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinService.apk) application.
 This application manages connections between any clients (other apps) wanting to use the
 Javelin device at the same time. Your android device must be Bluetooth Low Energy compatible.
 
