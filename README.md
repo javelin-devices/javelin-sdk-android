@@ -18,7 +18,7 @@ This application manages connections between any clients (other apps) wanting to
 Javelin device at the same time. Your android device must be Bluetooth Low Energy compatible.
 
 
-You can also [checkout or download the example project](https://github.com/javelin-dev/javelin-sdk-examples) to get you started.
+You can also [checkout the example project source code](https://github.com/javelin-dev/javelin-sdk-examples) or download the [sample application](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinExamples.apk) to get you started.
 
 ## Connecting to the Javelin Device
 ### Setting permissions
