@@ -28,10 +28,8 @@ To be able to connect to the Javelin device, declare the following permissions i
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 ```
 
-Once the permissions are set up, all we need is the device address that you want to connect to. To retrieve this we we can either:
-
--  [Scan all nearby devices](#nearby) and retrieve the device address of the one you'd like to connect to.
-- Let the Javelin SDK [connect to the closest available](#autoconnect) Javelin Device.
+Once the permissions are set up, all we need is the device address that you want to connect to. To retrieve this we must scan nearby devices, retrieve the right
+device address we want to connect to, and send it to the SDK.
 
 
 ### Scanning nearby devices  <a name="nearby"></a>
