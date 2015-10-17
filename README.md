@@ -1,3 +1,5 @@
+You can access the API javadocs [here](http://www.javelindevices.com/javelin_docs/index.html).
+
 ## Getting Started
 Create a project with an API Level target of at least 18, or JellyBean 4.3.
 
