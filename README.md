@@ -1,6 +1,6 @@
+## Resources
 You can access the [API javadocs here](http://www.javelindevices.com/javelin_docs/index.html).
 
-## Resources
 **You must download and install** the [JavelinServiceApp](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinService.apk) application on your android device.
 This application manages connections between any clients (other apps) wanting to use the
 Javelin device at the same time. Your android device must be Bluetooth Low Energy compatible.
