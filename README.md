@@ -7,7 +7,7 @@ Javelin device at the same time. Your android device must be Bluetooth Low Energ
 
 You can also [checkout the tutorial section and example application source code here](https://github.com/javelin-dev/javelin-sdk-examples) or download the [example application](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinExamples.apk) to get you started.
 
-Visit the [Starter Code Repo](https://github.com/javelin-devices/javelin-starter-code) and download code that will take care of connecting to the Javeling and receiving data, so you can dive right into coding your app.
+Visit the [Starter Code Repo](https://github.com/javelin-devices/javelin-starter-code) and download code that will take care of connecting to the Javelin and receiving data, so you can dive right into coding your app.
 
 ## Getting Started
 Install and set up [Android Studio](http://developer.android.com/training/basics/firstapp/index.html)
