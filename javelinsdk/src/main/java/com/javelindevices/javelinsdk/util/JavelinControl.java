@@ -57,7 +57,8 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
         DMP_CONTROL,
         DMP_QUAT_CONTROL,
         DMP_FEATURE_TAP,
-        DMP_FEATURE_ORIENT;
+        DMP_FEATURE_ORIENT,
+        DMP_PEDOMETER_CONTROL;
 
         public int getIndex() {
             return this.ordinal();
@@ -67,7 +68,8 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
     public enum IMUControlDef {
         IMU_WOM,
         IMU_LP_ACC,
-        IMU_RAW_NORMAL;
+        IMU_RAW_NORMAL,
+        IMU_SLEEP;
 
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
@@ -107,7 +109,8 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
         CONTROL_INVALID_SETTING_WAKE_THRESHOLD,
         CONTROL_INVALID_SETTING_LP_ACC_SAMPLE_RATE,
         CONTROL_INVALID_SETTING_DMP_FEATURE_TAP,
-        CONTROL_INVALID_SETTING_DMP_FEATURE_ORIENT;
+        CONTROL_INVALID_SETTING_DMP_FEATURE_ORIENT,
+        CONTROL_INVALID_SETTING_DMP_PEDOMETER_CTRL;
 
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
@@ -205,9 +208,7 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
 
     public enum QuatControl {
         OFF,
-        QUAT_3X,
-        QUAT_6X,
-        QUAT_9X;
+        ON;
 
         public int getIndex() {
             return this.ordinal() + DEFAULT_CMD;
@@ -307,6 +308,15 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
         ON;
 
         public int getIndex() {
+            return this.ordinal() + DEFAULT_CMD;
+        }
+    }
+
+    public enum DMP_PEDOMETER_CONTROL{
+        DMP_PEDOMETER_GET,
+        DMP_PEDOMETER_CLEAR;
+
+        public int getIndex(){
             return this.ordinal() + DEFAULT_CMD;
         }
     }
