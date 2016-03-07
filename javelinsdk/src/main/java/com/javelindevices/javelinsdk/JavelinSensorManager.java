@@ -41,15 +41,17 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     // For streamable (notification-based) sensors only.
     private HashMap<Integer, ArrayList<JavelinEventListener>> sensorListenersMap = new HashMap<Integer, ArrayList<JavelinEventListener>>();
 
-    private static JavelinSensorManager mSensorManager;
+    private JavelinSensorManager mSensorManager;
+    // private static JavelinSensorManager mSensorManager;
 
     // Singleton for those that would like to use one instead. There might be some memory savings.
-    public static JavelinSensorManager getJavelinSensorManager(Context context, String deviceAddress) {
+    /*public static JavelinSensorManager getJavelinSensorManager(Context context, String deviceAddress) {
         if(mSensorManager == null) {
             mSensorManager = new JavelinSensorManager(context, deviceAddress);
         }
         return mSensorManager;
-    }
+    }*/
+    
     /**
      * Create a JavelinSensorManager object
      *
