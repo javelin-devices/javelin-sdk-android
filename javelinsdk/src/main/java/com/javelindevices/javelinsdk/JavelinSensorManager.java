@@ -148,7 +148,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
      * @param implicitIntent - The original implicit intent
      * @return Explicit Intent created from the implicit original intent
      */
-    private static Intent createExplicitFromImplicitIntent(Context context, Intent implicitIntent) {
+    private Intent createExplicitFromImplicitIntent(Context context, Intent implicitIntent) {
         // Retrieve all services that can match the given intent
         PackageManager pm = context.getPackageManager();
         List<ResolveInfo> resolveInfo = pm.queryIntentServices(implicitIntent, 0);
