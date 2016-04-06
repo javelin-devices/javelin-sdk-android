@@ -62,6 +62,8 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         this.context = context;
         mMessenger = new Messenger(new IncomingHandler(this));
         this.deviceAddress = deviceAddress;
+        deviceAddressBundle = new Bundle();
+        deviceAddressBundle.putString("deviceAddress", deviceAddress);
 
         sensorListenersMap.put(ISensor.TYPE_ACCELEROMETER, new ArrayList<JavelinEventListener>());
         sensorListenersMap.put(ISensor.TYPE_MAGNETIC_FIELD, new ArrayList<JavelinEventListener>());
@@ -87,9 +89,10 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "Bound to javelin android service. Attempting to connect to " + deviceAddress);
             mService = new Messenger(service);
-            Bundle bundle = new Bundle();
-            bundle.putString("deviceAddress", deviceAddress);
-            sendMessage(BleMessage.MSG_CONNECT, 0, 0, bundle);
+            // Bundle bundle = new Bundle();
+            // bundle.putString("deviceAddress", deviceAddress);
+            // sendMessage(BleMessage.MSG_CONNECT, 0, 0, bundle);
+            sendMessage(BleMessage.MSG_CONNECT, 0, 0, deviceAddressBundle);
         }
 
         @Override
@@ -101,7 +104,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     };
 
     private void sendMessage(int message) {
-        sendMessage(message, -1, -1, null);
+        sendMessage(message, -1, -1, deviceAddressBundle);
     }
 
     private void sendMessage(int message, int arg1, int arg2, Object obj) {
@@ -226,6 +229,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     // Component Settings
     private final String deviceAddress;
+    private final Bundle deviceAddressBundle;
     private final SparseArray<Boolean> sensors = new SparseArray<Boolean>();
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
@@ -351,7 +355,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         } else {
             what = BleMessage.MSG_UNREGISTER_SENSOR;
         }
-        sendMessage(what, sensorType, 0, null);
+        sendMessage(what, sensorType, 0, deviceAddressBundle);
     }
 
     public boolean createBond() {
@@ -372,22 +376,22 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         } else {
             command = JavelinControl.LedControl.LED_OFF.getIndex();
         }
-        sendMessage(BleMessage.MSG_SET_CONTROL, BleMessage.TYPE_LED, command, null);
+        sendMessage(BleMessage.MSG_SET_CONTROL, BleMessage.TYPE_LED, command, deviceAddressBundle);
     }
 
     @Override
     public void setLedIntensity(int intensity) {
-        sendMessage(BleMessage.MSG_SET_INTENSITY, BleMessage.TYPE_LED, intensity, null);
+        sendMessage(BleMessage.MSG_SET_INTENSITY, BleMessage.TYPE_LED, intensity, deviceAddressBundle);
     }
 
     @Override
     public void setLedBlinkType(int blinkType) {
-        sendMessage(BleMessage.MSG_SET_TYPE, BleMessage.TYPE_LED, blinkType, null);
+        sendMessage(BleMessage.MSG_SET_TYPE, BleMessage.TYPE_LED, blinkType, deviceAddressBundle);
     }
 
     @Override
     public void setLedBlinkRate(int rate) {
-        sendMessage(BleMessage.MSG_SET_RATE, BleMessage.TYPE_LED, rate, null);
+        sendMessage(BleMessage.MSG_SET_RATE, BleMessage.TYPE_LED, rate, deviceAddressBundle);
     }
 
     // Note: A value of 255 will make it blink infinitely
@@ -395,7 +399,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     // This is also a setting, and will only actually blink once vibrationEnable() is called.
     @Override
     public void setLedBlinkNumber(int times) {
-        sendMessage(BleMessage.MSG_SET_PULSE, BleMessage.TYPE_LED, times, null);
+        sendMessage(BleMessage.MSG_SET_PULSE, BleMessage.TYPE_LED, times, deviceAddressBundle);
     }
 
     public void vibrationEnable(boolean enable) {
@@ -405,27 +409,27 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         } else {
             command = JavelinControl.VibrationControl.VIB_OFF.getIndex();
         }
-        sendMessage(BleMessage.MSG_SET_CONTROL, BleMessage.TYPE_VIBRATOR, command, null);
+        sendMessage(BleMessage.MSG_SET_CONTROL, BleMessage.TYPE_VIBRATOR, command, deviceAddressBundle);
     }
 
     @Override
     public void setVibrationIntensity(int intensity) {
-        sendMessage(BleMessage.MSG_SET_INTENSITY, BleMessage.TYPE_VIBRATOR, intensity, null);
+        sendMessage(BleMessage.MSG_SET_INTENSITY, BleMessage.TYPE_VIBRATOR, intensity, deviceAddressBundle);
     }
 
     @Override
     public void setVibrationType(int type) {
-        sendMessage(BleMessage.MSG_SET_TYPE, BleMessage.TYPE_VIBRATOR, type, null);
+        sendMessage(BleMessage.MSG_SET_TYPE, BleMessage.TYPE_VIBRATOR, type, deviceAddressBundle);
     }
 
     @Override
     public void setVibrationRate(int rate) {
-        sendMessage(BleMessage.MSG_SET_RATE, BleMessage.TYPE_VIBRATOR, rate, null);
+        sendMessage(BleMessage.MSG_SET_RATE, BleMessage.TYPE_VIBRATOR, rate, deviceAddressBundle);
     }
 
     @Override
     public void setVibrationRepeatNumber(int times) {
-        sendMessage(BleMessage.MSG_SET_PULSE, BleMessage.TYPE_VIBRATOR, times, null);
+        sendMessage(BleMessage.MSG_SET_PULSE, BleMessage.TYPE_VIBRATOR, times, deviceAddressBundle);
     }
 
     public void setAudioQuality(int quality) {
@@ -442,21 +446,21 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         double defaultRate = 1000.0; // the default gyro and accelerom sampling rate.
         int divisor = (int)Math.round(defaultRate / rate);
         Log.d(TAG, "Setting IMU sample rate to " + defaultRate / divisor);
-        sendMessage(BleMessage.MSG_SET_SAMPLING_RATE, ISensor.TYPE_ACCELEROMETER, divisor, null);
+        sendMessage(BleMessage.MSG_SET_SAMPLING_RATE, ISensor.TYPE_ACCELEROMETER, divisor, deviceAddressBundle);
     }
 
     @Override
     public void setAcceleromGyroSampleRateDivisor(int divisor) {
-        sendMessage(BleMessage.MSG_SET_SAMPLING_RATE, ISensor.TYPE_ACCELEROMETER, divisor, null);
+        sendMessage(BleMessage.MSG_SET_SAMPLING_RATE, ISensor.TYPE_ACCELEROMETER, divisor, deviceAddressBundle);
     }
 
     @Override
     public void setAccelerometerFullScaleRange(int range) {
-        sendMessage(BleMessage.MSG_SET_FULL_SCALE_RANGE, ISensor.TYPE_ACCELEROMETER, range, null);
+        sendMessage(BleMessage.MSG_SET_FULL_SCALE_RANGE, ISensor.TYPE_ACCELEROMETER, range, deviceAddressBundle);
     }
 
     @Override
     public void setGyroscopeFullScaleRange(int range) {
-        sendMessage(BleMessage.MSG_SET_FULL_SCALE_RANGE, ISensor.TYPE_GYROSCOPE, range, null);
+        sendMessage(BleMessage.MSG_SET_FULL_SCALE_RANGE, ISensor.TYPE_GYROSCOPE, range, deviceAddressBundle);
     }
 }
