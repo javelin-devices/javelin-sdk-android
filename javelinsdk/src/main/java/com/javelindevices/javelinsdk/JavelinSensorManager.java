@@ -62,8 +62,8 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         this.context = context;
         mMessenger = new Messenger(new IncomingHandler(this));
         this.deviceAddress = deviceAddress;
-        deviceAddressBundle = new Bundle();
-        deviceAddressBundle.putString("deviceAddress", deviceAddress);
+        this.deviceAddressBundle = new Bundle();
+        this.deviceAddressBundle.putString("deviceAddress", deviceAddress);
 
         sensorListenersMap.put(ISensor.TYPE_ACCELEROMETER, new ArrayList<JavelinEventListener>());
         sensorListenersMap.put(ISensor.TYPE_MAGNETIC_FIELD, new ArrayList<JavelinEventListener>());
