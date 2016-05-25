@@ -367,7 +367,12 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         sendMessage(BleMessage.MSG_BOND_DESTROY);
         return true;
     }
-
+    public void connect(){
+        sendMessage(BleMessage.MSG_CONNECT, 0, 0, deviceAddressBundle);
+    }
+    public void disconnect(){
+        sendMessage(BleMessage.MSG_DISCONNECT);
+    }
 
     public void ledEnable(boolean enable) {
         int command = -1;
