@@ -18,12 +18,12 @@ public interface BleServiceListener {
     /**
      * <b>This method is called on separate from Main thread.</b>
      */
-    public void onServiceDiscovered();
+    public void onServiceDiscovered(String deviceAddress);
 
     /**
      * <b>This method is called on separate from Main thread.</b>
      */
-    public void onDataAvailable(String serviceUuid, String characteristicUUid, String text, byte[] data);
+    public void onDataAvailable(String serviceUuid, String characteristicUUid, String text, byte[] data, String deviceAddress);
 
 
     public void onReadRemoteRssi(int rssi);

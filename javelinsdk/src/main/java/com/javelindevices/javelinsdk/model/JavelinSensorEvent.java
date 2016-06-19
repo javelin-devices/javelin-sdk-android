@@ -6,6 +6,7 @@ public class JavelinSensorEvent {
      * Can be any of the types listed in {@link com.javelindevices.javelinsdk.model.ISensor}
      */
     public int sensor;
+    public String deviceAddress;
 
     /**
      * The length and contents of the array depends on which {@link #sensor} was returned.
@@ -29,8 +30,9 @@ public class JavelinSensorEvent {
      */
     public final float[] values;
 
-    public JavelinSensorEvent(int sensor, float[] values) {
+    public JavelinSensorEvent(int sensor, float[] values, String deviceAddress) {
         this.sensor = sensor;
         this.values = values;
+        this.deviceAddress = deviceAddress;
     }
 }

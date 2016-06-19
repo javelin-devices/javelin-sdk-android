@@ -209,7 +209,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
                         break;
                     case BleMessage.MSG_SENSOR_UPDATE:
                         Bundle b = (Bundle) msg.obj;
-                        client.onSensorChanged(msg.arg1, b.getFloatArray("data"));
+                        client.onSensorChanged(msg.arg1, b.getFloatArray("data"), b.getString("deviceAddress"));
                         break;
                     case BleMessage.MSG_SENSOR_RATE_CHANGED:
                         Log.d(TAG, "sensor " + msg.arg1 + " changed to rate: " + msg.arg2);
@@ -254,8 +254,8 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         try {
             context.unbindService(mConnection);
         } catch (Exception e) {
-        //    Log.w(TAG, "Something went wrong while unbinding the service.");
-        //    e.printStackTrace();
+            Log.w(TAG, "Something went wrong while unbinding the service.");
+            e.printStackTrace();
         }
         mService = null;
     }
@@ -286,11 +286,11 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         sendMessage(BleMessage.MSG_SENSOR_UNREGISTER_ALL);
     }
 
-    public void onSensorChanged(int sensor, float[] data) {
+    public void onSensorChanged(int sensor, float[] data, String deviceAddress) {
         if (data != null) {
             ArrayList<JavelinEventListener> listeners = sensorListenersMap.get(sensor);
             for (JavelinEventListener l : listeners) {
-                l.onSensorChanged(new JavelinSensorEvent(sensor, data));
+                l.onSensorChanged(new JavelinSensorEvent(sensor, data, deviceAddress));
             }
         }
     }
