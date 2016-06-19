@@ -341,11 +341,11 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     }
 
     @Override
-    public void onServiceDiscovered() {
+    public void onServiceDiscovered(String deviceAddress) {
     }
 
     @Override
-    public void onDataAvailable(String serviceUuid, String characteristicUUid, String text, byte[] data) {
+    public void onDataAvailable(String serviceUuid, String characteristicUUid, String text, byte[] data, String deviceAddress) {
     }
 
     private void enableJavelinSensor(int sensorType, boolean enable) {
