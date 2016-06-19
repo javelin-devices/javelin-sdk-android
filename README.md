@@ -1,33 +1,48 @@
-You can access the API javadocs [here](http://www.javelindevices.com/javelin_docs/index.html).
+## Resources
+You can access the [API javadocs here](http://www.javelindevices.com/javelin_docs/index.html).
 
-## Getting Started
-Create a project with an API Level target of at least 18, or JellyBean 4.3.
-
-To use the Javelin SDK add the following to your project's `build.gradle`:
-```
-repositories {
-    maven { url "https://jitpack.io" }
-}
-```
-In the application build.gradle declare the following dependency:
-```
-dependencies {
-    compile 'com.github.javelin-dev:javelin-sdk-android:v1.0.0'
-}
-```
-Finally, **you must download and install** the [JavelinServiceApp](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinService.apk) application.
+**You must download and install** the [JavelinServiceApp](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinService.apk) application on your android device.
 This application manages connections between any clients (other apps) wanting to use the
 Javelin device at the same time. Your android device must be Bluetooth Low Energy compatible.
 
+You can also [checkout the tutorial section and example application source code here](https://github.com/javelin-dev/javelin-sdk-examples) or download the [example application](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinExamples.apk) to get you started.
 
-You can also [checkout the example project source code](https://github.com/javelin-dev/javelin-sdk-examples) or download the [sample application](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinExamples.apk) to get you started.
+Visit the [Starter Code Repo](https://github.com/javelin-devices/javelin-starter-code) and download code that will take care of connecting to the Javelin and receiving data, so you can dive right into coding your app.
+
+## Getting Started
+Install and set up [Android Studio](http://developer.android.com/training/basics/firstapp/index.html)
+
+Create a project with an API Level target of at least 18, or JellyBean 4.3.
+
+To use the Javelin SDK add the following to your PROJECT'S `build.gradle` (the one in the :
+```
+allprojects{
+	repositories {
+		... (pre-existing repositories)
+    		maven { url "https://jitpack.io" }
+	}
+}
+```
+In the APPLICATION's `build.gradle` declare the following dependency:
+```
+dependencies {
+	...(pre-existing dependencies)
+	compile 'com.github.javelin-dev:javelin-sdk-android:v1.0.0'
+}
+```
 
 ## Connecting to the Javelin Device
 ### Setting permissions
 To be able to connect to the Javelin device, declare the following permissions in the manifest file:
 ```
-<uses-permission android:name="android.permission.BLUETOOTH"/>
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+<manifest>
+	<uses-permission android:name="android.permission.BLUETOOTH"/>
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+	<application>
+	...
+	</application>
+</manifest>
 ```
 
 Once the permissions are set up, all we need is the device address that you want to connect to. To retrieve this we must scan nearby devices, retrieve the right
@@ -56,14 +71,18 @@ JavelinSensorManager mSensorManager;
 		mSensorManager.setListener(this); // this activity will listen to connection events
 		mSensorManager.enable(); // Initiates the connection
 	}
-
+	
+	/*** JavelinEventListener Methods ***/
 	@Override
 	public void onSensorManagerConnected() {
 		// If this gets called, we've succeeded!
 	}
-	...
-	...
-	// Other implemented methods
+	@Override
+	public void onSensorManagerDisconnected(){...}
+	@Override
+	public void onSensorChanged(JavelinSensorEvent event){...}
+	@Override
+	public void onReadRemoteRssi(int rssi){...}
 	...
 	...
 }
@@ -105,7 +124,7 @@ We can then listen for sensor data via our `onSensorChanged(JavelinSensorEvent e
 	@Override
 	public void onSensorChanged(JavelinSensorEvent event) {
 		float[] sensorData = event.values;
-		switch (event.sensorType) {
+		switch (event.sensor) {
 			case ISensor.TYPE_ACCELEROMETER:
 				// Received some data from the accelerometer!
 				int x = sensorData[0]; // Do something with it
