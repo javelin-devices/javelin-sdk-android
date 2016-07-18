@@ -372,6 +372,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     }
     public void disconnect(){
         sendMessage(BleMessage.MSG_DISCONNECT);
+        this.onDisconnected();
     }
 
     public void ledEnable(boolean enable) {
