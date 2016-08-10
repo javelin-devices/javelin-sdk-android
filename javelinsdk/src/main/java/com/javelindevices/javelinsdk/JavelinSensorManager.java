@@ -185,7 +185,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         @Override
         public void handleMessage(Message msg) {
             JavelinSensorManager client = mClient.get();
-            if (client != null) {
+            if (client != null) { //TODO: Make sure we are not handling messages for other devices by checking device address
                 switch (msg.what) {
                     case BleMessage.MSG_CONNECT:
                         client.onConnected();
@@ -214,6 +214,14 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
                     case BleMessage.MSG_SENSOR_RATE_CHANGED:
                         Log.d(TAG, "sensor " + msg.arg1 + " changed to rate: " + msg.arg2);
                         break;
+                    case BleMessage.MSG_TRANSMIT_SN:
+                        //TODO: handle incoming serial number bundle
+                        Bundle b = (Bundle) msg.obj;
+                        if(b.getString("deviceAddress") == this.deviceAddress){
+                            this.serialNumber = b.getString("data").toCharArray()[0];
+                            Log.d(TAG,"Serial Number updated for device: " + this.deviceAddress + "--"+ this.serialNumber);
+                        }
+
                 }
             }
             super.handleMessage(msg);
@@ -229,9 +237,18 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     // Component Settings
     private final String deviceAddress;
+    private final char serialNumber;    //TODO: Make sure this should be a char
     private final Bundle deviceAddressBundle;
     private final SparseArray<Boolean> sensors = new SparseArray<Boolean>();
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
+
+    public String getDeviceAddress(){
+        return this.deviceAddress;
+    }
+
+    public char getSerialNumber(){
+        return this.serialNumber;
+    }
 
     @Override
     public void enable() {

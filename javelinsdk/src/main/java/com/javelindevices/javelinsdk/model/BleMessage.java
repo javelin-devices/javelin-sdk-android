@@ -21,6 +21,7 @@ public class BleMessage {
     public static final int MSG_SET_SAMPLING_RATE = 13;
     public static final int MSG_SET_FULL_SCALE_RANGE = 14;
     public static final int MSG_SET_FILTER = 15;
+    public static final int MSG_TRANSMIT_SN = 16;
 
     public static final int MSG_SENSOR_UNREGISTER_ALL = 50;
     public static final int MSG_SENSOR_RATE_CHANGED = 51;
