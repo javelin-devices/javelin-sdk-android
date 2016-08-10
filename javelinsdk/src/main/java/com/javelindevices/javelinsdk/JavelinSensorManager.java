@@ -185,6 +185,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
         @Override
         public void handleMessage(Message msg) {
             JavelinSensorManager client = mClient.get();
+            Bundle b;
             if (client != null) { //TODO: Make sure we are not handling messages for other devices by checking device address
                 switch (msg.what) {
                     case BleMessage.MSG_CONNECT:
@@ -208,7 +209,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
                         Log.d(TAG, "Unregistered sensor: " + msg.arg1);
                         break;
                     case BleMessage.MSG_SENSOR_UPDATE:
-                        Bundle b = (Bundle) msg.obj;
+                        b = (Bundle) msg.obj;
                         client.onSensorChanged(msg.arg1, b.getFloatArray("data"), b.getString("deviceAddress"));
                         break;
                     case BleMessage.MSG_SENSOR_RATE_CHANGED:
@@ -216,10 +217,10 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
                         break;
                     case BleMessage.MSG_TRANSMIT_SN:
                         //TODO: handle incoming serial number bundle
-                        Bundle b = (Bundle) msg.obj;
-                        if(b.getString("deviceAddress") == this.deviceAddress){
-                            this.serialNumber = b.getString("data").toCharArray()[0];
-                            Log.d(TAG,"Serial Number updated for device: " + this.deviceAddress + "--"+ this.serialNumber);
+                        b = (Bundle) msg.obj;
+                        if(b.getString("deviceAddress") == client.getDeviceAddress() ){
+                            client.setSerialNumber(b.getString("data").toCharArray()[0]);
+                            Log.d(TAG,"Serial Number updated for device: " + client.getDeviceAddress() + "--"+ client.getSerialNumber());
                         }
 
                 }
@@ -237,7 +238,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     // Component Settings
     private final String deviceAddress;
-    private final char serialNumber;    //TODO: Make sure this should be a char
+    private char serialNumber = '*';    //TODO: Make sure this should be a char
     private final Bundle deviceAddressBundle;
     private final SparseArray<Boolean> sensors = new SparseArray<Boolean>();
     private final Handler uiThreadHandler = new Handler(Looper.getMainLooper());
@@ -248,6 +249,16 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
 
     public char getSerialNumber(){
         return this.serialNumber;
+    }
+
+    public void setSerialNumber(char serialNumber){
+        if(this.serialNumber == '*'){
+            this.serialNumber = serialNumber;
+        }
+        else
+        {
+            Log.d(TAG, "Serial number has already been set.");
+        }
     }
 
     @Override
