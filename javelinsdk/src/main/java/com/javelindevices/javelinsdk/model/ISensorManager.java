@@ -106,6 +106,9 @@ public abstract class ISensorManager {
 
     /**
      * LED on/off switch. Will cancel any blinking taking place, if any.
+     * <p>
+     * Must set {@link #setLedBlinkType(int) setLedBlinkType(int blinkType)} before calling ledEnable(boolean)
+     * </p>
      * @param enable boolean
      */
     public abstract void ledEnable(boolean enable);
@@ -143,13 +146,14 @@ public abstract class ISensorManager {
 
     /**
      * Vibrator on / off switch. This will override any vibrations taking place.
-     * @param enable
+     *<p>
+     * Must set {@link #setVibrationType(int) setVibrationType(int type)} before calling vibrationEnable(boolean)
+     *</p>
+     * @param enable boolean
      */
     public abstract void vibrationEnable(boolean enable);
 
     /**
-     * Sets the intensity of the vibration from 1 to 100 inclusive, 100 being the strongest intensity.
-     *
      * @param intensity  the intensity of vibration from 1 to 100 inclusive.
      */
     public abstract void setVibrationIntensity(int intensity);
@@ -185,7 +189,7 @@ public abstract class ISensorManager {
 
     /**
      * Sets the sampling rate of the accelerometer and gyroscope to the value closest to the given
-     * parameter. The default rate, 1000Hz, must be divisible by the desired sample rate -- otherwise it attempts
+     * parameter. The default rate, 100Hz, must be divisible by the desired sample rate -- otherwise it attempts
      * to approximate it.
      *
      * @param rate the sampling rate to set the gyroscope and accelerometer to.
@@ -199,7 +203,7 @@ public abstract class ISensorManager {
 
     /**
      * Set the divisor used to divide the default sample rate up.
-     * The default sample rate is 1000Hz
+     * The default sample rate is 100Hz
      *
      * @param divisor
      */

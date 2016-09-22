@@ -5,7 +5,8 @@ import android.bluetooth.BluetoothGatt;
 /**
  * Created by Aaron on 4/11/2015.
  */
-public abstract class ServiceAction {
+public abstract class
+        ServiceAction {
     public enum ActionType {
         NONE,
         READ,

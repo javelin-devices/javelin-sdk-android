@@ -29,6 +29,7 @@ public class JavelinControl { //TODO: Could be renamed to Javelin constants
         BATTERY,
         SYSTEM_TIME_CONTROL;
 
+
         public int getIndex() {
             return this.ordinal();
         }

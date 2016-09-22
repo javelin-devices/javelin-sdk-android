@@ -437,7 +437,7 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     @Override
     public void setAcceleromGyroRate(int rate) {
         // The rate is set by
-        double defaultRate = 1000.0; // the default gyro and accelerom sampling rate.
+        double defaultRate = 100; // the default gyro and accelerom sampling rate.
         int divisor = (int)Math.round(defaultRate / rate);
         Log.d(TAG, "Setting IMU sample rate to " + defaultRate / divisor);
         sendMessage(BleMessage.MSG_SET_SAMPLING_RATE, ISensor.TYPE_ACCELEROMETER, divisor, null);
