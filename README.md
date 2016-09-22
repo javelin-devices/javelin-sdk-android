@@ -1,11 +1,11 @@
 ## Resources
 You can access the [API javadocs here](http://www.javelindevices.com/javelin_docs/index.html).
 
-**You must download and install** the [JavelinServiceApp](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinService.apk) application on your android device.
+**You must download and install** the [JavelinServiceApp](https://github.com/javelin-devices/javelin-sdk-examples-android/releases/download/v1.1/JavelinService1.1.apk) application on your android device.
 This application manages connections between any clients (other apps) wanting to use the
 Javelin device at the same time. Your android device must be Bluetooth Low Energy compatible.
 
-You can also [checkout the tutorial section and example application source code here](https://github.com/javelin-dev/javelin-sdk-examples) or download the [example application](https://github.com/javelin-dev/javelin-sdk-examples/releases/download/v1.0/JavelinExamples.apk) to get you started.
+You can also [checkout the tutorial section and example application source code here](https://github.com/javelin-dev/javelin-sdk-examples) or download the [example application](https://github.com/javelin-devices/javelin-sdk-examples-android/releases/download/v1.1/JavelinExamples1.1.apk) to get you started.
 
 Visit the [Starter Code Repo](https://github.com/javelin-devices/javelin-starter-code) and download code that will take care of connecting to the Javelin and receiving data, so you can dive right into coding your app.
 
