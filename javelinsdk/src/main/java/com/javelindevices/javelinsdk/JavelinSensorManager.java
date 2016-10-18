@@ -497,4 +497,8 @@ public class JavelinSensorManager extends ISensorManager implements BleServiceLi
     public void setGyroscopeFullScaleRange(int range) {
         sendMessage(BleMessage.MSG_SET_FULL_SCALE_RANGE, ISensor.TYPE_GYROSCOPE, range, deviceAddressBundle);
     }
+
+    public boolean isConnected(){
+        return connected;
+    }
 }
